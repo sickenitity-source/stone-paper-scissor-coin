@@ -23,7 +23,7 @@
 </head>
 <body>
     <h1>Stone-Paper-Scissor Coin Game</h1>
-    <div class="coins" id="coins">Coins: 1000</div>
+    <div class="coins" id="coins">Coins: 10000</div>
     <div class="level" id="level">Level: 1</div>
     <div class="progress" id="progress">Coins to next level: 50000</div>
 
@@ -44,7 +44,7 @@
     <button class="reset" onclick="resetGame()">Reset Game</button>
 
     <script>
-        let coins = 1000;
+        let coins = 10000; // starting coins
         let level = 1;
         const levelIncrement = 50000;
         let levelMultiplier = [4, 6, 8, 10, 15];
@@ -125,7 +125,7 @@
         }
 
         function resetGame() {
-            coins = 1000;
+            coins = 10000; // reset to 10,000 coins
             level = 1;
             bossMode = false;
             coinsDiv.textContent = "Coins: " + coins;
