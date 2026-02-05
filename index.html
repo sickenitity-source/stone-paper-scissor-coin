@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stone Paper Scissor Coin Game</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 30px; background: #f0f8ff; }
+        h1 { color: #0077cc; }
+        .coins { font-size: 20px; margin-bottom: 20px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; }
+        input[type="number"] { padding: 5px; width: 80px; font-size: 16px; }
+        .history { margin-top: 20px; max-width: 500px; margin-left: auto; margin-right: auto; text-align: left; }
+        .history p { border-bottom: 1px solid #ccc; padding: 5px; }
+        button.reset { margin-top: 10px; background: #ff4d4d; color: #fff; cursor: pointer; }
+        button:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <h1>Stone Paper Scissor Coin Game</h1>
+    <div class="coins" id="coins">Coins: 1000</div>
+
+    <input type="number" id="bet" placeholder="Bet Amount" min="1">
+    <br><br>
+    <button onclick="play('Stone')">🪨 Stone</button>
+    <button onclick="play('Paper')">📄 Paper</button>
+    <button onclick="play('Scissor')">✂️ Scissor</button>
+
+    <div class="history" id="history">
+        <h3>History:</h3>
+    </div>
+
+    <button class="reset" onclick="resetGame()">Reset Game</button>
+
+    <script>
+        let coins = 1000;
+        let historyDiv = document.getElementById('history');
+        let coinsDiv = document.getElementById('coins');
+
+        function play(userChoice) {
+            let betInput = document.getElementById('bet');
+            let bet = parseInt(betInput.value);
+            if (!bet || bet <= 0) {
+                alert("Enter a valid bet!");
+                return;
+            }
+            if (bet > coins) {
+                alert("Not enough coins!");
+                return;
+            }
+
+            const choices = ["Stone", "Paper", "Scissor"];
+            let aiChoice = choices[Math.floor(Math.random() * 3)];
+            let result = "";
+
+            if (userChoice === aiChoice) {
+                result = "Draw";
+                // no coin change
+            } else if (
+                (userChoice === "Stone" && aiChoice === "Scissor") ||
+                (userChoice === "Paper" && aiChoice === "Stone") ||
+                (userChoice === "Scissor" && aiChoice === "Paper")
+            ) {
+                result = "You Win!";
+                coins += bet * 3; // quadruple = original + 3*bet
+            } else {
+                result = "You Lose!";
+                coins -= bet;
+            }
+
+            coinsDiv.textContent = "Coins: " + coins;
+
+            let p = document.createElement('p');
+            p.innerHTML = `<strong>${result}</strong> - You: ${userChoice}, AI: ${aiChoice}, Bet: ${bet}`;
+            historyDiv.appendChild(p);
+
+            betInput.value = ""; // reset bet input
+        }
+
+        function resetGame() {
+            coins = 1000;
+            coinsDiv.textContent = "Coins: " + coins;
+            historyDiv.innerHTML = "<h3>History:</h3>";
+            document.getElementById('bet').value = "";
+        }
+    </script>
+</body>
+</html>
