@@ -1,216 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Stone-Paper-Scissor Coin Game</title>
-    <style>
-        body { 
-            font-family: Arial; 
-            text-align: center; 
-            padding: 30px; 
-            background: url('background.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: black;
-        }
-        h1 { color: black; }
-        .coins, .level, .progress { 
-            font-size: 20px; 
-            margin: 10px; 
-            color: black;
-        }
-        button { 
-            padding: 10px 20px; 
-            margin: 5px; 
-            font-size: 16px; 
-            cursor: pointer; 
-            border-radius: 5px; 
-            border: none; 
-        }
-        input[type="text"] { 
-            padding: 5px; 
-            width: 200px; 
-            font-size: 16px; 
-            margin: 5px; 
-        }
-        .history { 
-            margin-top: 20px; 
-            max-width: 600px; 
-            margin-left: auto; 
-            margin-right: auto; 
-            text-align: left; 
-        }
-        .history p { 
-            border-bottom: 1px solid #ccc; 
-            padding: 5px; 
-            color: black; 
-            background: rgba(255,255,255,0.7); 
-            border-radius: 5px; 
-        }
-        button.reset { 
-            margin-top: 10px; 
-            background: #ff4d4d; 
-            color: #fff; 
-            cursor: pointer; 
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Stone-Paper-Scissor Coin Game</title>
+<style>
+    body { 
+        font-family: Arial; 
+        text-align: center; 
+        padding: 30px; 
+        background: url('background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: black;
+    }
+    h1 { color: black; }
+    .info-box { 
+        font-size: 20px; 
+        margin: 10px; 
+        color: black; 
+        background: rgba(255,255,255,0.7); 
+        display: inline-block; 
+        padding: 10px 20px; 
+        border-radius: 10px;
+    }
+    button { 
+        padding: 10px 20px; 
+        margin: 5px; 
+        font-size: 16px; 
+        cursor: pointer; 
+        border-radius: 5px; 
+        border: none; 
+    }
+    input[type="text"] { 
+        padding: 5px; 
+        width: 200px; 
+        font-size: 16px; 
+        margin: 5px; 
+    }
+    .history { 
+        margin-top: 20px; 
+        max-width: 600px; 
+        margin-left: auto; 
+        margin-right: auto; 
+        text-align: left; 
+    }
+    .history p { 
+        border-bottom: 1px solid #ccc; 
+        padding: 5px; 
+        color: black; 
+        background: rgba(255,255,255,0.7); 
+        border-radius: 5px; 
+    }
+    button.reset { 
+        margin-top: 10px; 
+        background: #ff4d4d; 
+        color: #fff; 
+        cursor: pointer; 
+    }
+</style>
 </head>
 <body>
-    <h1>Stone-Paper-Scissor Coin Game</h1>
-    <div class="coins" id="coins"></div>
-    <div class="level" id="level"></div>
-    <div class="progress" id="progress"></div>
+<h1>Stone-Paper-Scissor Coin Game</h1>
 
-    <input type="text" id="bet" placeholder="Enter Bet or Secret Code">
-    <br><br>
-    <button onclick="playChoice('Stone')">🪨 Stone</button>
-    <button onclick="playChoice('Paper')">📄 Paper</button>
-    <button onclick="playChoice('Scissor')">✂️ Scissor</button>
+<div class="info-box" id="coins">Coins: 10000</div>
+<div class="info-box" id="level">Level: 1</div>
+<div class="info-box" id="progress">Coins to next level: 50000</div>
 
-    <div class="history" id="history">
-        <h3>History:</h3>
-    </div>
+<input type="text" id="bet" placeholder="Enter Bet or Secret Code">
+<br><br>
+<button onclick="playChoice('Stone')">🪨 Stone</button>
+<button onclick="playChoice('Paper')">📄 Paper</button>
+<button onclick="playChoice('Scissor')">✂️ Scissor</button>
 
-    <button class="reset" onclick="resetGame()">Reset Game</button>
+<div class="history" id="history">
+<h3>History:</h3>
+</div>
 
-    <script>
-        let coins = 10000;
-        let level = 1;
-        const levelIncrement = 50000;
-        let levelMultiplier = [4, 6, 8, 10, 15];
-        let bossMode = false;
-        const bossCode = "815165";
+<button class="reset" onclick="resetGame()">Reset Game</button>
 
-        let coinsDiv = document.getElementById('coins');
-        let levelDiv = document.getElementById('level');
-        let progressDiv = document.getElementById('progress');
-        let historyDiv = document.getElementById('history');
+<script>
+let coins = 10000;
+let level = 1;
+const levelIncrement = 50000;
+let levelMultiplier = [4, 6, 8, 10, 15];
+let bossMode = false;
+const bossCode = "815165";
 
-        let currentChoice = "";
+let coinsDiv = document.getElementById('coins');
+let levelDiv = document.getElementById('level');
+let progressDiv = document.getElementById('progress');
+let historyDiv = document.getElementById('history');
 
-        function updateCoins() {
-            coinsDiv.textContent = "Coins: " + coins;
+let currentChoice = "";
+
+// Always update the info boxes
+function updateInfo() {
+    coinsDiv.textContent = "Coins: " + coins;
+    if (!bossMode) {
+        levelDiv.textContent = "Level: " + level;
+        progressDiv.textContent = "Coins to next level: " + (level * levelIncrement - coins);
+    }
+}
+
+function playChoice(choice) {
+    currentChoice = choice;
+    play();
+}
+
+function play() {
+    let betInput = document.getElementById('bet');
+    let betValue = betInput.value.trim();
+
+    // BAL command
+    if (betValue.toLowerCase() === "bal") {
+        alert("Your current balance is: " + coins + " coins");
+        betInput.value = "";
+        updateInfo();
+        return;
+    }
+
+    // Secret boss code
+    if (betValue === bossCode) {
+        bossMode = true;
+        coins = 1000000;
+        levelDiv.textContent = "Secret Boss Level: The Boss of Hope";
+        progressDiv.textContent = "Reach 6,000,000 coins to win!";
+        updateInfo();
+        alert("Secret Boss Level unlocked! You have 1,000,000 coins. Multiply your wins ×4 to reach 6,000,000!");
+        betInput.value = "";
+        return;
+    }
+
+    // Validate numeric bet
+    let bet = parseInt(betValue);
+    if (!bet || bet <= 0) {
+        alert("Enter a valid bet or secret code!");
+        return;
+    }
+    if (bet > coins) {
+        alert("Not enough coins!");
+        return;
+    }
+    if (!currentChoice) {
+        alert("Choose Stone, Paper, or Scissor first!");
+        return;
+    }
+
+    const choices = ["Stone", "Paper", "Scissor"];
+    let aiChoice = choices[Math.floor(Math.random() * 3)];
+    let result = "";
+
+    if (currentChoice === aiChoice) {
+        result = "Draw";
+    } else if (
+        (currentChoice === "Stone" && aiChoice === "Scissor") ||
+        (currentChoice === "Paper" && aiChoice === "Stone") ||
+        (currentChoice === "Scissor" && aiChoice === "Paper")
+    ) {
+        result = "You Win!";
+        if (bossMode) {
+            coins += bet * 4;
+        } else {
+            let multiplier = levelMultiplier[Math.min(level-1, levelMultiplier.length-1)];
+            coins += bet * multiplier;
         }
-
-        function updateLevelProgress() {
-            if (!bossMode) {
-                levelDiv.textContent = "Level: " + level;
-                progressDiv.textContent = "Coins to next level: " + (level * levelIncrement - coins);
-            }
+    } else {
+        result = "You Lose!";
+        coins -= bet;
+        if (bossMode && coins <= 0) {
+            alert("That's why she left you. You lost her and the game.");
+            resetGame();
+            return;
         }
+    }
 
-        function playChoice(choice) {
-            currentChoice = choice;
-            play();
+    updateInfo();
+
+    if (!bossMode) {
+        let coinsRequired = level * levelIncrement;
+        if (coins >= coinsRequired) {
+            level++;
+            alert("Congratulations! You reached Level " + level + "!");
         }
-
-        function play() {
-            let betInput = document.getElementById('bet');
-            let betValue = betInput.value.trim();
-
-            // BAL command
-            if (betValue.toLowerCase() === "bal") {
-                alert("Your current balance is: " + coins + " coins");
-                betInput.value = "";
-                return;
-            }
-
-            // Secret boss code check
-            if (betValue === bossCode) {
-                bossMode = true;
-                coins = 1000000;
-                levelDiv.textContent = "Secret Boss Level: The Boss of Hope";
-                progressDiv.textContent = "Reach 6,000,000 coins to win!";
-                updateCoins();
-                alert("Secret Boss Level unlocked! You have 1,000,000 coins. Multiply your wins ×4 to reach 6,000,000!");
-                betInput.value = "";
-                return;
-            }
-
-            // Validate numeric bet
-            let bet = parseInt(betValue);
-            if (!bet || bet <= 0) {
-                alert("Enter a valid bet or secret code!");
-                return;
-            }
-            if (bet > coins) {
-                alert("Not enough coins!");
-                return;
-            }
-            if (!currentChoice) {
-                alert("Choose Stone, Paper, or Scissor first!");
-                return;
-            }
-
-            const choices = ["Stone", "Paper", "Scissor"];
-            let aiChoice = choices[Math.floor(Math.random() * 3)];
-            let result = "";
-
-            if (currentChoice === aiChoice) {
-                result = "Draw";
-            } else if (
-                (currentChoice === "Stone" && aiChoice === "Scissor") ||
-                (currentChoice === "Paper" && aiChoice === "Stone") ||
-                (currentChoice === "Scissor" && aiChoice === "Paper")
-            ) {
-                result = "You Win!";
-                if (bossMode) {
-                    coins += bet * 4;
-                } else {
-                    let multiplier = levelMultiplier[Math.min(level-1, levelMultiplier.length-1)];
-                    coins += bet * multiplier;
-                }
-            } else {
-                result = "You Lose!";
-                coins -= bet;
-                if (bossMode && coins <= 0) {
-                    alert("That's why she left you. You lost her and the game.");
-                    resetGame();
-                    return;
-                }
-            }
-
-            updateCoins();
-
-            if (!bossMode) {
-                let coinsRequired = level * levelIncrement;
-                if (coins >= coinsRequired) {
-                    level++;
-                    alert("Congratulations! You reached Level " + level + "!");
-                }
-                updateLevelProgress();
-            } else {
-                if (coins >= 6000000) {
-                    alert("You won from me... but not from your feelings.");
-                    resetGame();
-                    return;
-                }
-            }
-
-            let p = document.createElement('p');
-            p.innerHTML = `<strong>${result}</strong> - You: ${currentChoice}, AI: ${aiChoice}, Bet: ${bet}`;
-            historyDiv.appendChild(p);
-
-            betInput.value = "";
-            currentChoice = "";
+        updateInfo();
+    } else {
+        if (coins >= 6000000) {
+            alert("You won from me... but not from your feelings.");
+            resetGame();
+            return;
         }
+    }
 
-        function resetGame() {
-            coins = 10000;
-            level = 1;
-            bossMode = false;
-            updateCoins();
-            updateLevelProgress();
-            progressDiv.textContent = "Coins to next level: 50000";
-            historyDiv.innerHTML = "<h3>History:</h3>";
-            document.getElementById('bet').value = "";
-            currentChoice = "";
-        }
+    // Show history with balance included
+    let p = document.createElement('p');
+    p.innerHTML = `<strong>${result}</strong> - You: ${currentChoice}, AI: ${aiChoice}, Bet: ${bet}. Balance: ${coins}`;
+    historyDiv.appendChild(p);
 
-        // Show balance and level immediately
-        window.onload = function() {
-            updateCoins();
-            updateLevelProgress();
-        };
-    </script>
+    betInput.value = "";
+    currentChoice = "";
+}
+
+function resetGame() {
+    coins = 10000;
+    level = 1;
+    bossMode = false;
+    updateInfo();
+    progressDiv.textContent = "Coins to next level: 50000";
+    historyDiv.innerHTML = "<h3>History:</h3>";
+    document.getElementById('bet').value = "";
+    currentChoice = "";
+}
+
+// Show info immediately when page loads
+window.onload = updateInfo;
+</script>
 </body>
 </html>
