@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Stone-Paper-Scissor Coin Game - Levels & Boss</title>
+    <title>Stone-Paper-Scissor Coin Game</title>
     <style>
         body { 
             font-family: Arial; 
@@ -10,22 +10,55 @@
             padding: 30px; 
             background: url('background.jpg') no-repeat center center fixed;
             background-size: cover;
-            color: white;
+            color: black;
         }
-        h1 { color: #ffd700; }
-        .coins, .level, .progress { font-size: 20px; margin: 10px; }
-        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; }
-        input[type="text"] { padding: 5px; width: 200px; font-size: 16px; margin: 5px; }
-        .history { margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
-        .history p { border-bottom: 1px solid #ccc; padding: 5px; color: black; background: rgba(255,255,255,0.7); border-radius: 5px; }
-        button.reset { margin-top: 10px; background: #ff4d4d; color: #fff; cursor: pointer; }
+        h1 { color: black; }
+        .coins, .level, .progress { 
+            font-size: 20px; 
+            margin: 10px; 
+            color: black;
+        }
+        button { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            border-radius: 5px; 
+            border: none; 
+        }
+        input[type="text"] { 
+            padding: 5px; 
+            width: 200px; 
+            font-size: 16px; 
+            margin: 5px; 
+        }
+        .history { 
+            margin-top: 20px; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            text-align: left; 
+        }
+        .history p { 
+            border-bottom: 1px solid #ccc; 
+            padding: 5px; 
+            color: black; 
+            background: rgba(255,255,255,0.7); 
+            border-radius: 5px; 
+        }
+        button.reset { 
+            margin-top: 10px; 
+            background: #ff4d4d; 
+            color: #fff; 
+            cursor: pointer; 
+        }
     </style>
 </head>
 <body>
     <h1>Stone-Paper-Scissor Coin Game</h1>
-    <div class="coins" id="coins">Coins: 10000</div>
-    <div class="level" id="level">Level: 1</div>
-    <div class="progress" id="progress">Coins to next level: 50000</div>
+    <div class="coins" id="coins"></div>
+    <div class="level" id="level"></div>
+    <div class="progress" id="progress"></div>
 
     <input type="text" id="bet" placeholder="Enter Bet or Secret Code">
     <br><br>
@@ -40,7 +73,7 @@
     <button class="reset" onclick="resetGame()">Reset Game</button>
 
     <script>
-        let coins = 10000; // starting coins
+        let coins = 10000;
         let level = 1;
         const levelIncrement = 50000;
         let levelMultiplier = [4, 6, 8, 10, 15];
@@ -74,7 +107,14 @@
             let betInput = document.getElementById('bet');
             let betValue = betInput.value.trim();
 
-            // Check for secret code
+            // BAL command
+            if (betValue.toLowerCase() === "bal") {
+                alert("Your current balance is: " + coins + " coins");
+                betInput.value = "";
+                return;
+            }
+
+            // Secret boss code check
             if (betValue === bossCode) {
                 bossMode = true;
                 coins = 1000000;
@@ -96,7 +136,6 @@
                 alert("Not enough coins!");
                 return;
             }
-
             if (!currentChoice) {
                 alert("Choose Stone, Paper, or Scissor first!");
                 return;
@@ -167,7 +206,7 @@
             currentChoice = "";
         }
 
-        // Show balance immediately on page load
+        // Show balance and level immediately
         window.onload = function() {
             updateCoins();
             updateLevelProgress();
