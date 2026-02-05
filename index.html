@@ -15,7 +15,7 @@
         h1 { color: #ffd700; }
         .coins, .level, .progress { font-size: 20px; margin: 10px; }
         button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; }
-        input[type="number"] { padding: 5px; width: 180px; font-size: 16px; margin: 5px; }
+        input[type="text"] { padding: 5px; width: 200px; font-size: 16px; margin: 5px; }
         .history { margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
         .history p { border-bottom: 1px solid #ccc; padding: 5px; color: black; background: rgba(255,255,255,0.7); border-radius: 5px; }
         button.reset { margin-top: 10px; background: #ff4d4d; color: #fff; cursor: pointer; }
@@ -27,11 +27,8 @@
     <div class="level" id="level">Level: 1</div>
     <div class="progress" id="progress">Coins to next level: 50000</div>
 
-    <input type="number" id="bet" placeholder="Bet Amount or Secret Code" min="1">
-    <br>
-    <button onclick="play()">Play</button>
+    <input type="text" id="bet" placeholder="Enter Bet or Secret Code">
     <br><br>
-
     <button onclick="playChoice('Stone')">🪨 Stone</button>
     <button onclick="playChoice('Paper')">📄 Paper</button>
     <button onclick="playChoice('Scissor')">✂️ Scissor</button>
@@ -57,11 +54,6 @@
 
         let currentChoice = "";
 
-        function playChoice(choice) {
-            currentChoice = choice;
-            play();
-        }
-
         function updateCoins() {
             coinsDiv.textContent = "Coins: " + coins;
         }
@@ -71,6 +63,11 @@
                 levelDiv.textContent = "Level: " + level;
                 progressDiv.textContent = "Coins to next level: " + (level * levelIncrement - coins);
             }
+        }
+
+        function playChoice(choice) {
+            currentChoice = choice;
+            play();
         }
 
         function play() {
@@ -89,19 +86,19 @@
                 return;
             }
 
-            // Check if player selected a choice
-            if (!currentChoice) {
-                alert("Choose Stone, Paper, or Scissor first!");
-                return;
-            }
-
+            // Validate numeric bet
             let bet = parseInt(betValue);
             if (!bet || bet <= 0) {
-                alert("Enter a valid bet!");
+                alert("Enter a valid bet or secret code!");
                 return;
             }
             if (bet > coins) {
                 alert("Not enough coins!");
+                return;
+            }
+
+            if (!currentChoice) {
+                alert("Choose Stone, Paper, or Scissor first!");
                 return;
             }
 
@@ -118,7 +115,7 @@
             ) {
                 result = "You Win!";
                 if (bossMode) {
-                    coins += bet * 4; // boss multiplier
+                    coins += bet * 4;
                 } else {
                     let multiplier = levelMultiplier[Math.min(level-1, levelMultiplier.length-1)];
                     coins += bet * multiplier;
@@ -170,9 +167,11 @@
             currentChoice = "";
         }
 
-        // initialize display
-        updateCoins();
-        updateLevelProgress();
+        // Show balance immediately on page load
+        window.onload = function() {
+            updateCoins();
+            updateLevelProgress();
+        };
     </script>
 </body>
 </html>
