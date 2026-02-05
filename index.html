@@ -2,25 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Stone Paper Scissor Coin Game</title>
+    <title>Stone-Paper-Scissor Coin Game - Levels & Boss</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 30px; background: #f0f8ff; }
-        h1 { color: #0077cc; }
-        .coins { font-size: 20px; margin-bottom: 20px; }
+        body { 
+            font-family: Arial; 
+            text-align: center; 
+            padding: 30px; 
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+        }
+        h1 { color: #ffd700; }
+        .coins, .level, .progress { font-size: 20px; margin: 10px; }
         button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; }
-        input[type="number"] { padding: 5px; width: 80px; font-size: 16px; }
-        .history { margin-top: 20px; max-width: 500px; margin-left: auto; margin-right: auto; text-align: left; }
-        .history p { border-bottom: 1px solid #ccc; padding: 5px; }
+        input[type="number"], input[type="text"] { padding: 5px; width: 120px; font-size: 16px; margin: 5px; }
+        .history { margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+        .history p { border-bottom: 1px solid #ccc; padding: 5px; color: black; background: rgba(255,255,255,0.7); border-radius: 5px; }
         button.reset { margin-top: 10px; background: #ff4d4d; color: #fff; cursor: pointer; }
-        button:hover { opacity: 0.8; }
     </style>
 </head>
 <body>
-    <h1>Stone Paper Scissor Coin Game</h1>
+    <h1>Stone-Paper-Scissor Coin Game</h1>
     <div class="coins" id="coins">Coins: 1000</div>
+    <div class="level" id="level">Level: 1</div>
+    <div class="progress" id="progress">Coins to next level: 50000</div>
 
     <input type="number" id="bet" placeholder="Bet Amount" min="1">
+    <br>
+    <input type="text" id="secret" placeholder="Enter secret code">
+    <button onclick="checkSecret()">Submit Code</button>
     <br><br>
+
     <button onclick="play('Stone')">🪨 Stone</button>
     <button onclick="play('Paper')">📄 Paper</button>
     <button onclick="play('Scissor')">✂️ Scissor</button>
@@ -33,8 +45,17 @@
 
     <script>
         let coins = 1000;
+        let level = 1;
+        const levelIncrement = 50000;
+        let levelMultiplier = [4, 6, 8, 10, 15];
         let historyDiv = document.getElementById('history');
         let coinsDiv = document.getElementById('coins');
+        let levelDiv = document.getElementById('level');
+        let progressDiv = document.getElementById('progress');
+
+        // Secret boss level
+        let bossMode = false;
+        const bossCode = "815165";
 
         function play(userChoice) {
             let betInput = document.getElementById('bet');
@@ -54,33 +75,79 @@
 
             if (userChoice === aiChoice) {
                 result = "Draw";
-                // no coin change
             } else if (
                 (userChoice === "Stone" && aiChoice === "Scissor") ||
                 (userChoice === "Paper" && aiChoice === "Stone") ||
                 (userChoice === "Scissor" && aiChoice === "Paper")
             ) {
                 result = "You Win!";
-                coins += bet * 3; // quadruple = original + 3*bet
+                if (bossMode) {
+                    coins += bet * 4; // boss multiplier
+                } else {
+                    let multiplier = levelMultiplier[Math.min(level-1, levelMultiplier.length-1)];
+                    coins += bet * multiplier;
+                }
             } else {
                 result = "You Lose!";
                 coins -= bet;
+                if (bossMode && coins <= 0) {
+                    alert("That's why she left you. You lost her and the game.");
+                    resetGame();
+                    return;
+                }
             }
 
             coinsDiv.textContent = "Coins: " + coins;
+
+            if (!bossMode) {
+                // Update level
+                let coinsRequired = level * levelIncrement;
+                if (coins >= coinsRequired) {
+                    level++;
+                    alert("Congratulations! You reached Level " + level + "!");
+                }
+                levelDiv.textContent = "Level: " + level;
+                progressDiv.textContent = "Coins to next level: " + (level * levelIncrement - coins);
+            } else {
+                // Boss level check
+                if (coins >= 6000000) {
+                    alert("You won from me... but not from your feelings.");
+                    resetGame();
+                    return;
+                }
+            }
 
             let p = document.createElement('p');
             p.innerHTML = `<strong>${result}</strong> - You: ${userChoice}, AI: ${aiChoice}, Bet: ${bet}`;
             historyDiv.appendChild(p);
 
-            betInput.value = ""; // reset bet input
+            betInput.value = ""; 
         }
 
         function resetGame() {
             coins = 1000;
+            level = 1;
+            bossMode = false;
             coinsDiv.textContent = "Coins: " + coins;
+            levelDiv.textContent = "Level: " + level;
+            progressDiv.textContent = "Coins to next level: 50000";
             historyDiv.innerHTML = "<h3>History:</h3>";
             document.getElementById('bet').value = "";
+            document.getElementById('secret').value = "";
+        }
+
+        function checkSecret() {
+            let codeInput = document.getElementById('secret').value;
+            if (codeInput === bossCode) {
+                bossMode = true;
+                coins = 1000000;
+                levelDiv.textContent = "Secret Boss Level: The Boss of Hope";
+                progressDiv.textContent = "Reach 6,000,000 coins to win!";
+                alert("Secret Boss Level unlocked! You have 1,000,000 coins. Multiply your wins ×4 to reach 6,000,000!");
+                document.getElementById('secret').value = "";
+            } else {
+                alert("Incorrect code!");
+            }
         }
     </script>
 </body>
