@@ -8,8 +8,7 @@
         font-family: Arial; 
         text-align: center; 
         padding: 30px; 
-        background: url('background.jpg') no-repeat center center fixed;
-        background-size: cover;
+        background: lightgray; /* Use plain background to avoid display issues */
         color: black;
     }
     h1 { color: black; }
@@ -17,7 +16,7 @@
         font-size: 20px; 
         margin: 10px; 
         color: black; 
-        background: rgba(255,255,255,0.7); 
+        background: rgba(255,255,255,0.9); 
         display: inline-block; 
         padding: 10px 20px; 
         border-radius: 10px;
@@ -47,7 +46,7 @@
         border-bottom: 1px solid #ccc; 
         padding: 5px; 
         color: black; 
-        background: rgba(255,255,255,0.7); 
+        background: rgba(255,255,255,0.8); 
         border-radius: 5px; 
     }
     button.reset { 
@@ -110,7 +109,7 @@ function play() {
     let betInput = document.getElementById('bet');
     let betValue = betInput.value.trim();
 
-    // BAL command
+    // 1️⃣ Check special commands first
     if (betValue.toLowerCase() === "bal") {
         alert("Your current balance is: " + coins + " coins");
         betInput.value = "";
@@ -118,7 +117,6 @@ function play() {
         return;
     }
 
-    // Secret boss code
     if (betValue === bossCode) {
         bossMode = true;
         coins = 1000000;
@@ -130,7 +128,7 @@ function play() {
         return;
     }
 
-    // Validate numeric bet
+    // 2️⃣ Validate numeric bet
     let bet = parseInt(betValue);
     if (!bet || bet <= 0) {
         alert("Enter a valid bet or secret code!");
@@ -145,6 +143,7 @@ function play() {
         return;
     }
 
+    // 3️⃣ Play game
     const choices = ["Stone", "Paper", "Scissor"];
     let aiChoice = choices[Math.floor(Math.random() * 3)];
     let result = "";
@@ -173,15 +172,12 @@ function play() {
         }
     }
 
-    updateInfo();
-
+    // 4️⃣ Level up and boss checks
     if (!bossMode) {
-        let coinsRequired = level * levelIncrement;
-        if (coins >= coinsRequired) {
+        if (coins >= level * levelIncrement) {
             level++;
             alert("Congratulations! You reached Level " + level + "!");
         }
-        updateInfo();
     } else {
         if (coins >= 6000000) {
             alert("You won from me... but not from your feelings.");
@@ -190,7 +186,9 @@ function play() {
         }
     }
 
-    // Show history with balance included
+    updateInfo();
+
+    // 5️⃣ Show result and balance in history
     let p = document.createElement('p');
     p.innerHTML = `<strong>${result}</strong> - You: ${currentChoice}, AI: ${aiChoice}, Bet: ${bet}. Balance: ${coins}`;
     historyDiv.appendChild(p);
