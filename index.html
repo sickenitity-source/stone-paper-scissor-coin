@@ -15,7 +15,7 @@
         h1 { color: #ffd700; }
         .coins, .level, .progress { font-size: 20px; margin: 10px; }
         button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; border-radius: 5px; border: none; }
-        input[type="number"], input[type="text"] { padding: 5px; width: 120px; font-size: 16px; margin: 5px; }
+        input[type="number"] { padding: 5px; width: 180px; font-size: 16px; margin: 5px; }
         .history { margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
         .history p { border-bottom: 1px solid #ccc; padding: 5px; color: black; background: rgba(255,255,255,0.7); border-radius: 5px; }
         button.reset { margin-top: 10px; background: #ff4d4d; color: #fff; cursor: pointer; }
@@ -27,15 +27,14 @@
     <div class="level" id="level">Level: 1</div>
     <div class="progress" id="progress">Coins to next level: 50000</div>
 
-    <input type="number" id="bet" placeholder="Bet Amount" min="1">
+    <input type="number" id="bet" placeholder="Bet Amount or Secret Code" min="1">
     <br>
-    <input type="text" id="secret" placeholder="Enter secret code">
-    <button onclick="checkSecret()">Submit Code</button>
+    <button onclick="play()">Play</button>
     <br><br>
 
-    <button onclick="play('Stone')">🪨 Stone</button>
-    <button onclick="play('Paper')">📄 Paper</button>
-    <button onclick="play('Scissor')">✂️ Scissor</button>
+    <button onclick="playChoice('Stone')">🪨 Stone</button>
+    <button onclick="playChoice('Paper')">📄 Paper</button>
+    <button onclick="playChoice('Scissor')">✂️ Scissor</button>
 
     <div class="history" id="history">
         <h3>History:</h3>
@@ -48,18 +47,55 @@
         let level = 1;
         const levelIncrement = 50000;
         let levelMultiplier = [4, 6, 8, 10, 15];
-        let historyDiv = document.getElementById('history');
-        let coinsDiv = document.getElementById('coins');
-        let levelDiv = document.getElementById('level');
-        let progressDiv = document.getElementById('progress');
-
-        // Secret boss level
         let bossMode = false;
         const bossCode = "815165";
 
-        function play(userChoice) {
+        let coinsDiv = document.getElementById('coins');
+        let levelDiv = document.getElementById('level');
+        let progressDiv = document.getElementById('progress');
+        let historyDiv = document.getElementById('history');
+
+        let currentChoice = "";
+
+        function playChoice(choice) {
+            currentChoice = choice;
+            play();
+        }
+
+        function updateCoins() {
+            coinsDiv.textContent = "Coins: " + coins;
+        }
+
+        function updateLevelProgress() {
+            if (!bossMode) {
+                levelDiv.textContent = "Level: " + level;
+                progressDiv.textContent = "Coins to next level: " + (level * levelIncrement - coins);
+            }
+        }
+
+        function play() {
             let betInput = document.getElementById('bet');
-            let bet = parseInt(betInput.value);
+            let betValue = betInput.value.trim();
+
+            // Check for secret code
+            if (betValue === bossCode) {
+                bossMode = true;
+                coins = 1000000;
+                levelDiv.textContent = "Secret Boss Level: The Boss of Hope";
+                progressDiv.textContent = "Reach 6,000,000 coins to win!";
+                updateCoins();
+                alert("Secret Boss Level unlocked! You have 1,000,000 coins. Multiply your wins ×4 to reach 6,000,000!");
+                betInput.value = "";
+                return;
+            }
+
+            // Check if player selected a choice
+            if (!currentChoice) {
+                alert("Choose Stone, Paper, or Scissor first!");
+                return;
+            }
+
+            let bet = parseInt(betValue);
             if (!bet || bet <= 0) {
                 alert("Enter a valid bet!");
                 return;
@@ -73,12 +109,12 @@
             let aiChoice = choices[Math.floor(Math.random() * 3)];
             let result = "";
 
-            if (userChoice === aiChoice) {
+            if (currentChoice === aiChoice) {
                 result = "Draw";
             } else if (
-                (userChoice === "Stone" && aiChoice === "Scissor") ||
-                (userChoice === "Paper" && aiChoice === "Stone") ||
-                (userChoice === "Scissor" && aiChoice === "Paper")
+                (currentChoice === "Stone" && aiChoice === "Scissor") ||
+                (currentChoice === "Paper" && aiChoice === "Stone") ||
+                (currentChoice === "Scissor" && aiChoice === "Paper")
             ) {
                 result = "You Win!";
                 if (bossMode) {
@@ -97,19 +133,16 @@
                 }
             }
 
-            coinsDiv.textContent = "Coins: " + coins;
+            updateCoins();
 
             if (!bossMode) {
-                // Update level
                 let coinsRequired = level * levelIncrement;
                 if (coins >= coinsRequired) {
                     level++;
                     alert("Congratulations! You reached Level " + level + "!");
                 }
-                levelDiv.textContent = "Level: " + level;
-                progressDiv.textContent = "Coins to next level: " + (level * levelIncrement - coins);
+                updateLevelProgress();
             } else {
-                // Boss level check
                 if (coins >= 6000000) {
                     alert("You won from me... but not from your feelings.");
                     resetGame();
@@ -118,37 +151,28 @@
             }
 
             let p = document.createElement('p');
-            p.innerHTML = `<strong>${result}</strong> - You: ${userChoice}, AI: ${aiChoice}, Bet: ${bet}`;
+            p.innerHTML = `<strong>${result}</strong> - You: ${currentChoice}, AI: ${aiChoice}, Bet: ${bet}`;
             historyDiv.appendChild(p);
 
-            betInput.value = ""; 
+            betInput.value = "";
+            currentChoice = "";
         }
 
         function resetGame() {
-            coins = 10000; // reset to 10,000 coins
+            coins = 10000;
             level = 1;
             bossMode = false;
-            coinsDiv.textContent = "Coins: " + coins;
-            levelDiv.textContent = "Level: " + level;
+            updateCoins();
+            updateLevelProgress();
             progressDiv.textContent = "Coins to next level: 50000";
             historyDiv.innerHTML = "<h3>History:</h3>";
             document.getElementById('bet').value = "";
-            document.getElementById('secret').value = "";
+            currentChoice = "";
         }
 
-        function checkSecret() {
-            let codeInput = document.getElementById('secret').value;
-            if (codeInput === bossCode) {
-                bossMode = true;
-                coins = 1000000;
-                levelDiv.textContent = "Secret Boss Level: The Boss of Hope";
-                progressDiv.textContent = "Reach 6,000,000 coins to win!";
-                alert("Secret Boss Level unlocked! You have 1,000,000 coins. Multiply your wins ×4 to reach 6,000,000!");
-                document.getElementById('secret').value = "";
-            } else {
-                alert("Incorrect code!");
-            }
-        }
+        // initialize display
+        updateCoins();
+        updateLevelProgress();
     </script>
 </body>
 </html>
